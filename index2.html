@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesan Online - Warung Jogan Kopi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6F4E37; /* Cokelat kopi tua */
+            --secondary-color: #8B5E3C; /* Cokelat kopi sedang */
+            --accent-color: #A07855; /* Cokelat kopi muda */
+            --background-color: #F5EFE6; /* Krem muda */
+            --text-color: #333333;
+            --white-color: #FFFFFF;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px 0 80px 0; /* Tambah padding bawah untuk checkout bar */
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: var(--white-color);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            margin-bottom: 5px;
+        }
+
+        header h2 {
+            color: var(--secondary-color);
+            font-size: 1.8em;
+            margin-top: 0;
+        }
+
+        .contact-info {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .datetime {
+            text-align: right;
+            font-size: 0.85em;
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .section-title::after {
+            content: '▼';
+            font-size: 0.8em;
+            transition: transform 0.3s ease;
+        }
+
+        .section-title.active::after {
+            content: '▲'; /* Mengubah ikon panah saat aktif */
+        }
+
+        .menu-items {
+            display: none;
+            padding: 15px 0;
+            border: 1px solid #eee;
+            border-top: none;
+            border-bottom-left-radius: var(--border-radius);
+            border-bottom-right-radius: var(--border-radius);
+            margin-bottom: 20px;
+        }
+
+        .menu-items.active {
+            display: block;
+        }
+
+        .menu-item {
+            display: flex;
+            flex-wrap: wrap; /* Mengizinkan wrap untuk elemen di dalamnya */
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-details {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            min-width: 180px; /* Menjaga agar detail item tidak terlalu kecil */
+        }
+
+        .item-details .logo {
+            font-size: 1.5em;
+            margin-right: 10px;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .item-name {
+            font-weight: 600;
+        }
+
+        .item-price {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-left: 15px;
+            min-width: 70px;
+            text-align: right;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            margin-left: auto; /* Pindahkan ke kanan */
+            margin-top: 5px; /* Sedikit spasi di mobile */
+        }
+
+        .quantity-controls button {
+            background-color: var(--accent-color);
+            color: var(--white-color);
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 1.2em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .quantity-controls button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .quantity-controls span {
+            margin: 0 10px;
+            font-weight: 600;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .variant-input, .notes-input {
+            margin-top: 10px; /* Spasi dari elemen di atasnya */
+            width: calc(100% - 30px); /* Lebar penuh, dikurangi padding */
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9em;
+            flex-grow: 1;
+        }
+
+        .option-buttons {
+            display: flex;
+            margin-top: 10px; /* Spasi dari elemen di atasnya */
+            width: 100%; /* Lebar penuh */
+            justify-content: flex-end; /* Posisikan tombol ke kanan */
+            gap: 5px; /* Jarak antar tombol */
+        }
+
+        .option-buttons button {
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85em; /* Ukuran font lebih kecil */
+            transition: background-color 0.2s;
+        }
+
+        .option-buttons button.selected,
+        .option-buttons button:hover {
+            background-color: var(--accent-color);
+            color: var(--white-color);
+            border-color: var(--accent-color);
+        }
+
+        .checkout-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--secondary-color);
+            color: var(--white-color);
+            padding: 10px 20px; /* Perkecil padding */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            box-sizing: border-box; /* Pastikan padding tidak menambah lebar */
+        }
+
+        .total-price {
+            font-size: 1.1em; /* Perkecil ukuran font */
+            font-weight: 700;
+        }
+
+        .checkout-button {
+            background-color: var(--accent-color);
+            color: var(--white-color);
+            border: none;
+            padding: 8px 18px; /* Perkecil padding tombol */
+            border-radius: var(--border-radius);
+            font-size: 0.95em; /* Perkecil ukuran font */
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .checkout-button:hover {
+            background-color: var(--primary-color);
+        }
+
+        /* Modal for Checkout */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1001; /* Di atas checkout bar */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--white-color);
+            margin: auto;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close-button {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #000;
+            text-decoration: none;
+        }
+
+        .modal-content h3 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="tel"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1em;
+        }
+
+        .payment-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .payment-options label {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .payment-options input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .payment-options label:hover {
+            background-color: #f0f0f0;
+            border-color: var(--accent-color);
+        }
+
+        .payment-options input[type="radio"]:checked + span {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .pay-order-button {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            border: none;
+            padding: 12px 25px;
+            border-radius: var(--border-radius);
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: background-color 0.2s;
+        }
+
+        .pay-order-button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px 0 80px 0; /* Sesuaikan padding agar checkout bar tidak menutupi konten */
+            }
+            .container {
+                padding: 15px;
+                margin: 10px auto;
+            }
+            header h1 {
+                font-size: 2em;
+            }
+            header h2 {
+                font-size: 1.5em;
+            }
+            .checkout-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 5px; /* Perkecil jarak */
+                padding: 10px;
+            }
+            .checkout-button {
+                width: 100%;
+                text-align: center;
+                padding: 10px 15px; /* Sesuaikan padding tombol */
+            }
+            .pay-order-button {
+                width: 100%;
+                text-align: center;
+            }
+            .menu-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .item-details {
+                width: 100%; /* Ambil lebar penuh */
+                margin-bottom: 5px;
+            }
+            .item-price {
+                margin-left: 0;
+            }
+            .quantity-controls {
+                width: 100%;
+                justify-content: flex-end; /* Rata kanan */
+                margin-left: 0;
+            }
+            .variant-input, .notes-input {
+                width: calc(100% - 20px); /* Sesuaikan agar tidak terlalu lebar */
+                margin-top: 5px;
+            }
+            .option-buttons {
+                width: 100%;
+                justify-content: flex-end; /* Rata kanan */
+                margin-top: 5px;
+            }
+            .option-buttons button {
+                flex-grow: 0; /* Jangan penuhi lebar */
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PESAN ONLINE</h1>
+            <h2>WARUNG JOGAN KOPI</h2>
+            <p class="contact-info">Jl. Manggis No. 102, Purworejo, Ds. Purwosari, Kecamatan Wonoasri, Kabupaten Madiun. TELP: 0857-3158-5559.</p>
+        </header>
+
+        <p class="datetime" id="currentDateTime"></p>
+
+        <p style="text-align: center; font-weight: 600; margin-bottom: 30px;">Pesan Dibawah ya!, Jika muncul pop up pembayaran klik X.</p>
+
+        <div class="section-title" data-target="menuEs">
+            <span>MENU ES 🧋</span>
+        </div>
+        <div class="menu-items" id="menuEs">
+            <div class="menu-item" data-id="1" data-price="3000" data-name="NUTRISARI ALL VARIAN">
+                <div class="item-details">
+                    <span class="logo">🟧</span>
+                    <span class="item-name">NUTRISARI ALL VARIAN</span>
+                    <span class="item-price">Rp3.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+                <input type="text" class="variant-input" placeholder="Tulis Variant">
+            </div>
+            <div class="menu-item" data-id="2" data-price="2000" data-name="SISRI ALL VARIANT">
+                <div class="item-details">
+                    <span class="logo">🟥</span>
+                    <span class="item-name">SISRI ALL VARIANT</span>
+                    <span class="item-price">Rp2.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+                <input type="text" class="variant-input" placeholder="Tulis Variant">
+            </div>
+            <div class="menu-item" data-id="3" data-price="2000" data-name="MARIMAS ALL VARIANT">
+                <div class="item-details">
+                    <span class="logo">🟨</span>
+                    <span class="item-name">MARIMAS ALL VARIANT</span>
+                    <span class="item-price">Rp2.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+                <input type="text" class="variant-input" placeholder="Tulis Variant">
+            </div>
+            <div class="menu-item" data-id="4" data-price="2000" data-name="JASJUS ALL VARIANT">
+                <div class="item-details">
+                    <span class="logo">🟪</span>
+                    <span class="item-name">JASJUS ALL VARIANT</span>
+                    <span class="item-price">Rp2.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+                <input type="text" class="variant-input" placeholder="Tulis Variant">
+            </div>
+            <div class="menu-item" data-id="5" data-price="2000" data-name="TEAJUS ALL VARIANT">
+                <div class="item-details">
+                    <span class="logo">🟩</span>
+                    <span class="item-name">TEAJUS ALL VARIANT</span>
+                    <span class="item-price">Rp2.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+                <input type="text" class="variant-input" placeholder="Tulis Variant">
+            </div>
+            <div class="menu-item" data-id="6" data-price="3000" data-name="C1000 SD ALL VARIANT">
+                <div class="item-details">
+                    <span class="logo">🟦</span>
+                    <span class="item-name">C1000 SD ALL VARIANT</span>
+                    <span class="item-price">Rp3.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="7" data-price="3000" data-name="POP ICE ALL VARIANT">
+                <div class="item-details">
+                    <span class="logo">🟧</span>
+                    <span class="item-name">POP ICE ALL VARIANT</span>
+                    <span class="item-price">Rp3.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+                <input type="text" class="variant-input" placeholder="Tulis Variant">
+            </div>
+            <div class="menu-item" data-id="8" data-price="4000" data-name="MAX TEA">
+                <div class="item-details">
+                    <span class="logo">🟥</span>
+                    <span class="item-name">MAX TEA</span>
+                    <span class="item-price">Rp4.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="9" data-price="4000" data-name="GOOD DAY FREEZE">
+                <div class="item-details">
+                    <span class="logo">🟪</span>
+                    <span class="item-name">GOOD DAY FREEZE</span>
+                    <span class="item-price">Rp4.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="10" data-price="4000" data-name="MILO">
+                <div class="item-details">
+                    <span class="logo">🟫</span>
+                    <span class="item-name">MILO</span>
+                    <span class="item-price">Rp4.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="11" data-price="4000" data-name="GOOD DAY">
+                <div class="item-details">
+                    <span class="logo">🟫</span>
+                    <span class="item-name">GOOD DAY</span>
+                    <span class="item-price">Rp4.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="12" data-price="4000" data-name="CHOCOLATOS ALL VARIANT">
+                <div class="item-details">
+                    <span class="logo">🟫</span>
+                    <span class="item-name">CHOCOLATOS ALL VARIANT</span>
+                    <span class="item-price">Rp4.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+                <input type="text" class="variant-input" placeholder="Tulis Variant">
+            </div>
+        </div>
+
+        <div class="section-title" data-target="menuAngko">
+            <span>☕MENU ANGET DAN KOPI🍵</span>
+        </div>
+        <div class="menu-items" id="menuAngko">
+            <div class="menu-item" data-id="13" data-price="3000" data-name="TORA SUSU">
+                <div class="item-details">
+                    <span class="logo">🟫</span>
+                    <span class="item-name">TORA SUSU</span>
+                    <span class="item-price">Rp3.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="14" data-price="3000" data-name="TORA MOKA">
+                <div class="item-details">
+                    <span class="logo">🟫</span>
+                    <span class="item-name">TORA MOKA</span>
+                    <span class="item-price">Rp3.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="15" data-price="3000" data-name="WHITE KOFFEE">
+                <div class="item-details">
+                    <span class="logo">🟫</span>
+                    <span class="item-name">WHITE KOFFEE</span>
+                    <span class="item-price">Rp3.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="16" data-price="3000" data-name="JAHE AMH">
+                <div class="item-details">
+                    <span class="logo">🟫</span>
+                    <span class="item-name">JAHE AMH</span>
+                    <span class="item-price">Rp3.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="17" data-price="3000" data-name="SUSU JAHE">
+                <div class="item-details">
+                    <span class="logo">🟫</span>
+                    <span class="item-name">SUSU JAHE</span>
+                    <span class="item-price">Rp3.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="18" data-price="3000" data-name="TOP COFFEE SUSU">
+                <div class="item-details">
+                    <span class="logo">🟫</span>
+                    <span class="item-name">TOP COFFEE SUSU</span>
+                    <span class="item-price">Rp3.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="19" data-price="3000" data-name="TOP COFFEE GULA AREN">
+                <div class="item-details">
+                    <span class="logo">🟫</span>
+                    <span class="item-name">TOP COFFEE GULA AREN</span>
+                    <span class="item-price">Rp3.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+                <div class="option-buttons">
+                    <button data-option="Dingin">Dingin</button>
+                    <button data-option="Panas">Panas</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="20" data-price="3000" data-name="TOP CAPPUCINO">
+                <div class="item-details">
+                    <span class="logo">🟫</span>
+                    <span class="item-name">TOP CAPPUCINO</span>
+                    <span class="item-price">Rp3.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+                <div class="option-buttons">
+                    <button data-option="Dingin">Dingin</button>
+                    <button data-option="Panas">Panas</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="21" data-price="4000" data-name="SUSU COKLAT">
+                <div class="item-details">
+                    <span class="logo">🟫</span>
+                    <span class="item-name">SUSU COKLAT</span>
+                    <span class="item-price">Rp4.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+                <div class="option-buttons">
+                    <button data-option="Dingin">Dingin</button>
+                    <button data-option="Panas">Panas</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="22" data-price="4000" data-name="SUSU PUTIH">
+                <div class="item-details">
+                    <span class="logo">🟫</span>
+                    <span class="item-name">SUSU PUTIH</span>
+                    <span class="item-price">Rp4.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+                <div class="option-buttons">
+                    <button data-option="Dingin">Dingin</button>
+                    <button data-option="Panas">Panas</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title" data-target="menuMie">
+            <span>🍜MENU MIE🥡</span>
+        </div>
+        <div class="menu-items" id="menuMie">
+            <div class="menu-item" data-id="23" data-price="5000" data-name="INDOMIE GORENG">
+                <div class="item-details">
+                    <span class="logo">🍜</span>
+                    <span class="item-name">INDOMIE GORENG</span>
+                    <span class="item-price">Rp5.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="24" data-price="5000" data-name="SEDAAP GORENG">
+                <div class="item-details">
+                    <span class="logo">🍜</span>
+                    <span class="item-name">SEDAAP GORENG</span>
+                    <span class="item-price">Rp5.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="25" data-price="5000" data-name="INDOMIE ALL VARIANT">
+                <div class="item-details">
+                    <span class="logo">🍜</span>
+                    <span class="item-name">INDOMIE ALL VARIANT</span>
+                    <span class="item-price">Rp5.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+                <input type="text" class="notes-input" placeholder="Tambah Keterangan Rasa">
+            </div>
+            <div class="menu-item" data-id="26" data-price="5000" data-name="SEDAAP ALL VARIANT">
+                <div class="item-details">
+                    <span class="logo">🍜</span>
+                    <span class="item-name">SEDAAP ALL VARIANT</span>
+                    <span class="item-price">Rp5.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+                <input type="text" class="notes-input" placeholder="Tambah Keterangan Rasa">
+            </div>
+            <div class="menu-item" data-id="27" data-price="5000" data-name="WOW SPAGHETTI CARBONARA">
+                <div class="item-details">
+                    <span class="logo">🍝</span>
+                    <span class="item-name">WOW SPAGHETTI CARBONARA</span>
+                    <span class="item-price">Rp5.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="28" data-price="5000" data-name="WOW SPAGHETTI BOLOGNESE">
+                <div class="item-details">
+                    <span class="logo">🍝</span>
+                    <span class="item-name">WOW SPAGHETTI BOLOGNESE</span>
+                    <span class="item-price">Rp5.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="29" data-price="5000" data-name="WOW SPAGHETTI AGLIO O LIO">
+                <div class="item-details">
+                    <span class="logo">🍝</span>
+                    <span class="item-name">WOW SPAGHETTI AGLIO O LIO</span>
+                    <span class="item-price">Rp5.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="30" data-price="7000" data-name="MIE SUKSES ISI 2 ALL VARIANT">
+                <div class="item-details">
+                    <span class="logo">🍜</span>
+                    <span class="item-name">MIE SUKSES ISI 2 ALL VARIANT</span>
+                    <span class="item-price">Rp7.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+                <input type="text" class="notes-input" placeholder="Tambah Keterangan Rasa">
+            </div>
+            <div class="menu-item" data-id="31" data-price="8000" data-name="MIE SEDAAP CUP ALL VARIANT">
+                <div class="item-details">
+                    <span class="logo">🥡</span>
+                    <span class="item-name">MIE SEDAAP CUP ALL VARIANT</span>
+                    <span class="item-price">Rp8.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+                <input type="text" class="notes-input" placeholder="Tambah Keterangan Rasa">
+            </div>
+            <div class="menu-item" data-id="32" data-price="8000" data-name="POP MIE CUP ALL VARIANT">
+                <div class="item-details">
+                    <span class="logo">🥡</span>
+                    <span class="item-name">POP MIE CUP ALL VARIANT</span>
+                    <span class="item-price">Rp8.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+                <input type="text" class="notes-input" placeholder="Tambah Keterangan Rasa">
+            </div>
+        </div>
+
+        <div class="section-title" data-target="menuJajanan">
+            <span>😋MENU JAJANAN🥨</span>
+        </div>
+        <div class="menu-items" id="menuJajanan">
+            <div class="menu-item" data-id="33" data-price="1000" data-name="CHOKI CHOKI">
+                <div class="item-details">
+                    <span class="logo">🍫</span>
+                    <span class="item-name">CHOKI CHOKI</span>
+                    <span class="item-price">Rp1.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="34" data-price="1000" data-name="TANGO">
+                <div class="item-details">
+                    <span class="logo">🍫</span>
+                    <span class="item-name">TANGO</span>
+                    <span class="item-price">Rp1.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="35" data-price="1000" data-name="CHOCOLATOS PANJANG">
+                <div class="item-details">
+                    <span class="logo">🍫</span>
+                    <span class="item-name">CHOCOLATOS PANJANG</span>
+                    <span class="item-price">Rp1.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="36" data-price="2000" data-name="BETTER">
+                <div class="item-details">
+                    <span class="logo">🍰</span>
+                    <span class="item-name">BETTER</span>
+                    <span class="item-price">Rp2.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="37" data-price="1000" data-name="MIKAKO & Sejenisnya">
+                <div class="item-details">
+                    <span class="logo">🍬</span>
+                    <span class="item-name">MIKAKO & Sejenisnya</span>
+                    <span class="item-price">Rp1.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="38" data-price="2000" data-name="JAJANAN RP2000 (GANTUNG)">
+                <div class="item-details">
+                    <span class="logo">🛍️</span>
+                    <span class="item-name">JAJANAN RP2000 (GANTUNG)</span>
+                    <span class="item-price">Rp2.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="39" data-price="2000" data-name="NABATI WAFELLO & Sejenisnya">
+                <div class="item-details">
+                    <span class="logo">🍫</span>
+                    <span class="item-name">NABATI WAFELLO & Sejenisnya</span>
+                    <span class="item-price">Rp2.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="40" data-price="500" data-name="MOMOGI / SIP">
+                <div class="item-details">
+                    <span class="logo">🍘</span>
+                    <span class="item-name">MOMOGI / SIP</span>
+                    <span class="item-price">Rp500</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="41" data-price="2500" data-name="ROTI AOKA / ORCHID">
+                <div class="item-details">
+ <span class="logo">🍞</span>
+                    <span class="item-name">ROTI AOKA / ORCHID</span>
+                    <span class="item-price">Rp2.500</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+            <div class="menu-item" data-id="42" data-price="4000" data-name="AIR PUTIH">
+                <div class="item-details">
+                    <span class="logo">💧</span>
+                    <span class="item-name">AIR PUTIH</span>
+                    <span class="item-price">Rp4.000</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="minus-btn">-</button>
+                    <span class="quantity">0</span>
+                    <button class="plus-btn">+</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="checkout-bar">
+        <div class="total-price">Total: Rp0</div>
+        <button class="checkout-button" id="checkoutButton">CHECKOUT DAN BAYAR</button>
+    </div>
+
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>Konfirmasi Pesanan</h3>
+            <div class="form-group">
+                <label for="customerName">Nama Pemesan:</label>
+                <input type="text" id="customerName" required>
+            </div>
+            <div class="form-group">
+                <label for="orderTime">Jam Pesan:</label>
+                <input type="text" id="orderTime" value="" readonly>
+            </div>
+            <div class="form-group">
+                <p>Silahkan Pilih metode pembayaran:</p>
+                <div class="payment-options">
+                    <label>
+                        <input type="radio" name="paymentMethod" value="QRIS" checked>
+                        <span>QRIS</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="paymentMethod" value="TUNAI">
+                        <span>TUNAI</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="paymentMethod" value="TF">
+                        <span>TF</span>
+                    </label>
+                </div>
+            </div>
+            <button class="pay-order-button" id="payOrderButton">BAYAR DAN PESAN</button>
+<p style="font-size: 0.8em; text-align: center; margin-top: 15px; color: #888;">Data pesanan akan terkirim ke bot Telegram.</p>
+        </div>
+    </div>
+
+    <script>
+        const menuData = {}; // Store item quantities and options
+
+        // Update current date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            const formattedDate = now.toLocaleDateString('id-ID', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
+            const formattedTime = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            document.getElementById('currentDateTime').textContent = `Tanggal: ${formattedDate}. Waktu: ${formattedTime}`;
+            document.getElementById('orderTime').value = formattedTime; // Set initial time for the modal
+        }
+        setInterval(updateDateTime, 1000); // Update every second
+        updateDateTime(); // Initial call
+
+        // Toggle menu sections
+        document.querySelectorAll('.section-title').forEach(title => {
+            title.addEventListener('click', () => {
+                const targetId = title.dataset.target;
+                const targetMenu = document.getElementById(targetId);
+                title.classList.toggle('active');
+                targetMenu.classList.toggle('active');
+            });
+        });
+
+        // Quantity controls and option buttons
+        document.querySelectorAll('.menu-item').forEach(item => {
+            const itemId = item.dataset.id;
+            const itemPrice = parseInt(item.dataset.price);
+            const quantitySpan = item.querySelector('.quantity');
+            const plusBtn = item.querySelector('.plus-btn');
+            const minusBtn = item.querySelector('.minus-btn');
+            const variantInput = item.querySelector('.variant-input');
+            const notesInput = item.querySelector('.notes-input');
+            const optionButtons = item.querySelectorAll('.option-buttons button');
+
+            menuData[itemId] = {
+                quantity: 0,
+                price: itemPrice,
+                name: item.dataset.name,
+                variant: '',
+                notes: '',
+                option: ''
+            };
+
+            if (variantInput) {
+                variantInput.addEventListener('input', (e) => {
+                    menuData[itemId].variant = e.target.value;
+                });
+            }
+
+            if (notesInput) {
+                notesInput.addEventListener('input', (e) => {
+                    menuData[itemId].notes = e.target.value;
+                });
+            }
+
+            optionButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    optionButtons.forEach(btn => btn.classList.remove('selected'));
+                    button.classList.add('selected');
+                    menuData[itemId].option = button.dataset.option;
+                    updateTotal();
+                });
+            });
+
+            plusBtn.addEventListener('click', () => {
+                menuData[itemId].quantity++;
+                quantitySpan.textContent = menuData[itemId].quantity;
+                updateTotal();
+            });
+
+            minusBtn.addEventListener('click', () => {
+                if (menuData[itemId].quantity > 0) {
+                    menuData[itemId].quantity--;
+                    quantitySpan.textContent = menuData[itemId].quantity;
+                    updateTotal();
+                }
+            });
+        });
+
+        function updateTotal() {
+            let total = 0;
+            for (const id in menuData) {
+                total += menuData[id].quantity * menuData[id].price;
+            }
+            document.querySelector('.total-price').textContent = `Total: Rp${total.toLocaleString('id-ID')}`;
+        }
+
+        // Checkout Modal Logic
+        const checkoutModal = document.getElementById('checkoutModal');
+        const checkoutButton = document.getElementById('checkoutButton');
+        const closeButton = document.querySelector('.close-button');
+        const payOrderButton = document.getElementById('payOrderButton');
+        const customerNameInput = document.getElementById('customerName');
+
+        checkoutButton.addEventListener('click', () => {
+            const selectedItems = Object.values(menuData).filter(item => item.quantity > 0);
+            if (selectedItems.length === 0) {
+                alert('Pilih setidaknya satu item untuk melanjutkan checkout.');
+                return;
+            }
+            updateDateTime(); // Update time just before opening modal
+            checkoutModal.style.display = 'flex';
+        });
+
+        closeButton.addEventListener('click', () => {
+            checkoutModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target == checkoutModal) {
+                checkoutModal.style.display = 'none';
+            }
+        });
+
+        payOrderButton.addEventListener('click', () => {
+            const customerName = customerNameInput.value.trim();
+            if (!customerName) {
+                alert('Mohon masukkan nama pemesan.');
+                return;
+            }
+
+            const orderDetails = {
+                customerName: customerName,
+                orderTime: document.getElementById('orderTime').value,
+                paymentMethod: document.querySelector('input[name="paymentMethod"]:checked').value,
+                items: []
+            };
+
+            let totalOrderPrice = 0;
+            for (const id in menuData) {
+                if (menuData[id].quantity > 0) {
+                    const item = menuData[id];
+                    let itemString = `${item.quantity}x ${item.name}`;
+                    if (item.variant) {
+                        itemString += ` (${item.variant})`;
+                    }
+                    if (item.notes) {
+                        itemString += ` [Catatan: ${item.notes}]`;
+                    }
+                    if (item.option) {
+                        itemString += ` [Pilihan: ${item.option}]`;
+                    }
+                    itemString += ` - Rp${(item.quantity * item.price).toLocaleString('id-ID')}`;
+                    orderDetails.items.push(itemString);
+                    totalOrderPrice += (item.quantity * item.price);
+                }
+            }
+            orderDetails.totalPrice = totalOrderPrice;
+
+            sendToTelegram(orderDetails);
+            checkoutModal.style.display = 'none';
+            alert('Pesanan Anda berhasil dikirim!');
+            resetOrder();
+        });
+
+        function resetOrder() {
+            for (const id in menuData) {
+                menuData[id].quantity = 0;
+                menuData[id].variant = '';
+                menuData[id].notes = '';
+                menuData[id].option = '';
+                document.querySelector(`.menu-item[data-id="${id}"] .quantity`).textContent = '0';
+                const variantInput = document.querySelector(`.menu-item[data-id="${id}"] .variant-input`);
+                if (variantInput) variantInput.value = '';
+                const notesInput = document.querySelector(`.menu-item[data-id="${id}"] .notes-input`);
+                if (notesInput) notesInput.value = '';
+                const optionButtons = document.querySelectorAll(`.menu-item[data-id="${id}"] .option-buttons button`);
+                optionButtons.forEach(btn => btn.classList.remove('selected'));
+            }
+            updateTotal();
+            customerNameInput.value = '';
+            document.querySelector('input[name="paymentMethod"][value="QRIS"]').checked = true;
+        }
+
+        // Telegram Bot Integration
+        const TELEGRAM_BOT_TOKEN = '8103332008:AAGHXun6GBgAmTxTN3037ZxlsFCuttnyEGQ'; // Replace with your bot token
+        const TELEGRAM_CHAT_ID = '6658188102'; // Replace with your chat ID
+
+        async function sendToTelegram(order) {
+            let message = `*PESANAN BARU - WARUNG JOGAN KOPI*\n\n`;
+            message += `*Nama Pemesan:* ${order.customerName}\n`;
+            message += `*Jam Pesan:* ${order.orderTime}\n`;
+            message += `*Metode Pembayaran:* ${order.paymentMethod}\n\n`;
+            message += `*Detail Pesanan:*\n`;
+            order.items.forEach(item => {
+                message += `- ${item}\n`;
+            });
+            message += `\n*Total Harga:* Rp${order.totalPrice.toLocaleString('id-ID')}\n`;
+
+            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            const params = {
+                chat_id: TELEGRAM_CHAT_ID,
+                text: message,
+                parse_mode: 'Markdown'
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(params)
+                });
+                const data = await response.json();
+                if (!data.ok) {
+                    console.error('Failed to send message to Telegram:', data.description);
+                }
+            } catch (error) {
+                console.error('Error sending message to Telegram:', error);
+            }
+        }
+    </script>
+</body>
+</html>
